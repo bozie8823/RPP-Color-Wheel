@@ -11,7 +11,6 @@
       --panel-2:#19223c;
       --text:#eef2ff;
       --muted:#a7b1d1;
-      --accent:#78a6ff;
       --border:rgba(255,255,255,.08);
       --shadow:0 20px 60px rgba(0,0,0,.35);
       --radius:18px;
@@ -388,6 +387,14 @@
       }
     }
 
+    function getBaseHandleIndex(mode){
+      switch(mode){
+        case 'analogous': return 1;
+        case 'monochromatic': return 2;
+        default: return 0;
+      }
+    }
+
     function getPalette(){
       const { hue, mode, saturation, lightness } = state;
       const hues = getHarmonyHues(hue, mode);
@@ -488,6 +495,7 @@
 
       const palette = getPalette();
       const isMono = state.mode === 'monochromatic';
+      const baseHandleIndex = getBaseHandleIndex(state.mode);
       const lineGroup = createSvgEl('g');
       const handleGroup = createSvgEl('g');
 
@@ -512,8 +520,13 @@
 
       palette.forEach((item, index) => {
         const p = hueToPoint(item.h);
-        const isBase = (state.mode === 'monochromatic' && index === 2) ||
-                       (state.mode !== 'monochromatic' && Math.abs(mod(item.h - state.hue, 360)) < 0.01);
+        const isBase = index === baseHandleIndex;
+
+        // In monochromatic mode, all palette hues sit on the same point.
+        // Only render the main draggable handle so overlapping circles do not block interaction.
+        if(isMono && !isBase){
+          return;
+        }
 
         if(isBase){
           handleGroup.appendChild(createSvgEl('circle', {

@@ -256,6 +256,12 @@
       <section class="panel left">
         <div class="control-grid">
           <div class="field">
+            <label for="emotionTarget">Mood/Emotional Target</label>
+            <select id="emotionTarget">
+              <option value="">Select a mood or emotional target</option>
+            </select>
+          </div>
+          <div class="field">
             <label for="mode">Harmony</label>
             <select id="mode">
               <option value="complementary">Complementary</option>
@@ -312,6 +318,126 @@
   <script>
     const svg = document.getElementById('wheelSvg');
     const modeEl = document.getElementById('mode');
+    const emotionTargetEl = document.getElementById('emotionTarget');
+
+    const emotionHueMap = {
+      action: 0,
+      passion: 2,
+      energy: 8,
+      excitement: 12,
+      strength: 355,
+      adventure: 15,
+      love: 350,
+
+      optimism: 30,
+      enthusiasm: 28,
+      freedom: 34,
+      originality: 26,
+      emotion: 22,
+      pleasure: 32,
+      youth: 36,
+
+      joy: 52,
+      wealth: 50,
+      positivity: 58,
+      happiness: 55,
+      clarity: 48,
+      curiosity: 45,
+      fun: 60,
+
+      nature: 110,
+      luck: 100,
+      harmony: 115,
+      loyalty_green: 120,
+      safety: 105,
+      prosperity: 95,
+      health: 125,
+
+      trust: 210,
+      power: 220,
+      confidence: 215,
+      loyalty_blue: 225,
+      success: 205,
+      security: 230,
+      purpose: 200,
+
+      spirituality: 270,
+      luxury: 285,
+      wisdom: 260,
+      justice: 250,
+      art: 290,
+      imagination: 275,
+      mystery: 280,
+      magic: 295,
+
+      femininity: 325,
+      creativity: 315,
+      respect: 330,
+      softness: 335,
+      gratitude: 320,
+      intuition: 340,
+      calm: 310
+    };
+
+    const emotionOptions = [
+      { label: 'Action', key: 'action' },
+      { label: 'Passion', key: 'passion' },
+      { label: 'Energy', key: 'energy' },
+      { label: 'Excitement', key: 'excitement' },
+      { label: 'Strength', key: 'strength' },
+      { label: 'Adventure', key: 'adventure' },
+      { label: 'Love', key: 'love' },
+
+      { label: 'Optimism', key: 'optimism' },
+      { label: 'Enthusiasm', key: 'enthusiasm' },
+      { label: 'Freedom', key: 'freedom' },
+      { label: 'Originality', key: 'originality' },
+      { label: 'Emotion', key: 'emotion' },
+      { label: 'Pleasure', key: 'pleasure' },
+      { label: 'Youth', key: 'youth' },
+
+      { label: 'Joy', key: 'joy' },
+      { label: 'Wealth', key: 'wealth' },
+      { label: 'Positivity', key: 'positivity' },
+      { label: 'Happiness', key: 'happiness' },
+      { label: 'Clarity', key: 'clarity' },
+      { label: 'Curiosity', key: 'curiosity' },
+      { label: 'Fun', key: 'fun' },
+
+      { label: 'Nature', key: 'nature' },
+      { label: 'Luck', key: 'luck' },
+      { label: 'Harmony', key: 'harmony' },
+      { label: 'Loyalty (Green)', key: 'loyalty_green' },
+      { label: 'Safety', key: 'safety' },
+      { label: 'Prosperity', key: 'prosperity' },
+      { label: 'Health', key: 'health' },
+
+      { label: 'Trust', key: 'trust' },
+      { label: 'Power', key: 'power' },
+      { label: 'Confidence', key: 'confidence' },
+      { label: 'Loyalty (Blue)', key: 'loyalty_blue' },
+      { label: 'Success', key: 'success' },
+      { label: 'Security', key: 'security' },
+      { label: 'Purpose', key: 'purpose' },
+
+      { label: 'Spirituality', key: 'spirituality' },
+      { label: 'Luxury', key: 'luxury' },
+      { label: 'Wisdom', key: 'wisdom' },
+      { label: 'Justice', key: 'justice' },
+      { label: 'Art', key: 'art' },
+      { label: 'Imagination', key: 'imagination' },
+      { label: 'Mystery', key: 'mystery' },
+      { label: 'Magic', key: 'magic' },
+
+      { label: 'Femininity', key: 'femininity' },
+      { label: 'Creativity', key: 'creativity' },
+      { label: 'Respect', key: 'respect' },
+      { label: 'Softness', key: 'softness' },
+      { label: 'Gratitude', key: 'gratitude' },
+      { label: 'Intuition', key: 'intuition' },
+      { label: 'Calm', key: 'calm' }
+    ];
+
     const paletteEl = document.getElementById('palette');
     const copyPaletteBtn = document.getElementById('copyPalette');
 
@@ -638,6 +764,15 @@
       });
     }
 
+    function populateEmotionTargetDropdown(){
+      emotionOptions.forEach(optionData => {
+        const option = document.createElement('option');
+        option.value = optionData.key;
+        option.textContent = optionData.label;
+        emotionTargetEl.appendChild(option);
+      });
+    }
+
     function renderAll(){
       drawWheel();
       renderPalette();
@@ -679,6 +814,13 @@
       renderAll();
     });
 
+    emotionTargetEl.addEventListener('change', () => {
+      const selected = emotionTargetEl.value;
+      if(!selected || !(selected in emotionHueMap)) return;
+      state.hue = emotionHueMap[selected];
+      renderAll();
+    });
+
     copyPaletteBtn.addEventListener('click', async () => {
       const text = getPalette().map(p => `${p.role}: ${p.hex}`).join('\n');
       try {
@@ -691,6 +833,7 @@
       }
     });
 
+    populateEmotionTargetDropdown();
     renderAll();
   </script>
 </body>

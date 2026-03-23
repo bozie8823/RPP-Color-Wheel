@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RHYTHM Pyro Color Wheel</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#131a2e;
+      --panel-2:#19223c;
+      --text:#eef2ff;
+      --muted:#a7b1d1;
+      --accent:#78a6ff;
+      --border:rgba(255,255,255,.08);
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(120,166,255,.18), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(157,99,255,.14), transparent 28%),
+        var(--bg);
+      color:var(--text);
+      min-height:100%;
+    }
+    body{
+      position:relative;
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        linear-gradient(rgba(6,10,20,.5), rgba(6,10,20,.5)),
+        url('RHYTHM_Pyro_Wallpaper_Cyber_4k_HotPinkBlue.jpg') center/cover no-repeat;
+      opacity:.5;
+      pointer-events:none;
+      z-index:0;
+    }
+    .wrap{
+      position:relative;
+      z-index:1;
+      max-width:1200px;
+      margin:0 auto;
+      padding:24px;
+    }
+    .hero{margin-bottom:20px}
+    .hero h1{
+      margin:0 0 8px;
+      font-size:clamp(1.7rem, 2.8vw, 2.7rem);
+      line-height:1.05;
+      letter-spacing:-.03em;
+    }
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      max-width:900px;
+      line-height:1.5;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:minmax(320px,1.2fr) minmax(280px,.9fr);
+      gap:20px;
+      align-items:start;
+    }
+    .right-col{
+      position:relative;
+      min-height:980px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      .right-col{min-height:auto}
+    }
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .left{padding:18px}
+    .right{
+      padding:18px;
+      position:relative;
+      z-index:2;
+    }
+    .control-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
+      margin-bottom:18px;
+    }
+    .field{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px 12px 14px;
+    }
+    .field label{
+      display:block;
+      font-size:.83rem;
+      color:var(--muted);
+      margin-bottom:8px;
+      font-weight:600;
+      letter-spacing:.02em;
+    }
+    select{
+      width:100%;
+      border:none;
+      outline:none;
+      background:var(--panel-2);
+      color:var(--text);
+      border-radius:10px;
+      padding:12px 12px;
+      font-size:1rem;
+    }
+    .canvas-wrap{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:12px;
+    }
+    svg{
+      width:100%;
+      height:auto;
+      display:block;
+      overflow:visible;
+      touch-action:none;
+      user-select:none;
+    }
+    .help{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.5;
+    }
+    .help strong{color:var(--text)}
+    .section-title{
+      margin:2px 0 14px;
+      font-size:1.08rem;
+      letter-spacing:-.01em;
+    }
+    .palette{
+      display:grid;
+      gap:12px;
+    }
+    .swatch{
+      display:grid;
+      grid-template-columns:64px 1fr auto;
+      gap:12px;
+      align-items:center;
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px;
+    }
+    .chip{
+      width:64px;
+      height:64px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .swatch .meta{min-width:0}
+    .swatch .title{
+      font-weight:700;
+      margin-bottom:4px;
+    }
+    .swatch .sub{
+      color:var(--muted);
+      font-size:.88rem;
+      word-break:break-word;
+      line-height:1.35;
+    }
+    .copy-btn{
+      border:none;
+      cursor:pointer;
+      color:var(--text);
+      background:var(--panel-2);
+      padding:10px 12px;
+      border-radius:10px;
+      font-weight:700;
+    }
+    .copy-btn:hover{filter:brightness(1.08)}
+    .action-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+    .note{
+      margin-top:14px;
+      color:var(--muted);
+      font-size:.93rem;
+      line-height:1.5;
+    }
+    .legend{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-top:16px;
+    }
+    .legend-card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px 12px;
+    }
+    .legend-card h4{
+      margin:0 0 4px;
+      font-size:.94rem;
+    }
+    .legend-card p{
+      margin:0;
+      color:var(--muted);
+      font-size:.85rem;
+      line-height:1.4;
+    }
+    .brand-logo{
+      position:absolute;
+      right:10px;
+      top:420px;
+      width:520px;
+      max-width:95%;
+      opacity:.95;
+      pointer-events:none;
+      filter:drop-shadow(0 20px 50px rgba(0,0,0,.45));
+      z-index:1;
+    }
+    @media (max-width: 980px){
+      .brand-logo{
+        position:static;
+        display:block;
+        margin:18px auto 0;
+        width:240px;
+        max-width:70%;
+      }
+      .legend{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>RHYTHM Pyro Color Wheel</h1>
+      <p>Pick a harmony mode, drag the main handle around the wheel, and use the generated palette to plan cleaner, more intentional color moments in a pyromusical.</p>
+    </div>
+
+    <div class="grid">
+      <section class="panel left">
+        <div class="control-grid">
+          <div class="field">
+            <label for="mode">Harmony</label>
+            <select id="mode">
+              <option value="complementary">Complementary</option>
+              <option value="analogous">Analogous</option>
+              <option value="triadic">Triadic</option>
+              <option value="tetradic">Tetradic</option>
+              <option value="monochromatic">Monochromatic</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="canvas-wrap">
+          <svg id="wheelSvg" viewBox="0 0 620 620" aria-labelledby="svgTitle svgDesc" role="img">
+            <title id="svgTitle">Interactive color harmony wheel</title>
+            <desc id="svgDesc">A color wheel with draggable handles representing harmony colors.</desc>
+          </svg>
+        </div>
+
+        <div class="help">
+          <strong>How to use it:</strong> drag the white-ring handle to set your anchor color. The related harmony colors move automatically. Monochromatic mode keeps the same hue and varies value for easier scene planning.
+        </div>
+
+        <div class="legend">
+          <div class="legend-card">
+            <h4>Pyro tip</h4>
+            <p>Use complementary and triadic scenes when you want strong contrast and obvious visual punctuation.</p>
+          </div>
+          <div class="legend-card">
+            <h4>Pyro tip</h4>
+            <p>Use analogous or monochromatic scenes when you want smoother emotional movement and less visual tension.</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="right-col">
+        <aside class="panel right">
+          <h2 class="section-title">Generated Palette</h2>
+          <div id="palette" class="palette"></div>
+
+          <div class="action-row">
+            <button class="copy-btn" id="copyPalette">Copy HEX palette</button>
+          </div>
+
+          <div class="note">
+            Tip for pyromusicals: white, silver, or gold often work as separation colors even when they are not part of a strict harmony.
+            Use them to break up dense same-hue passages.
+          </div>
+        </aside>
+        <img src="RPP_PYREboi_white (tilt).png" class="brand-logo" alt="">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const svg = document.getElementById('wheelSvg');
+    const modeEl = document.getElementById('mode');
+    const paletteEl = document.getElementById('palette');
+    const copyPaletteBtn = document.getElementById('copyPalette');
+
+    const cx = 310;
+    const cy = 310;
+    const outerR = 250;
+    const innerR = 170;
+
+    let state = {
+      mode: 'complementary',
+      hue: 6,
+      saturation: 85,
+      lightness: 55,
+      dragging: false
+    };
+
+    function clamp(v, min, max){ return Math.min(max, Math.max(min, v)); }
+    function mod(n, m){ return ((n % m) + m) % m; }
+
+    function hslToRgb(h, s, l){
+      h = mod(h, 360) / 360;
+      s /= 100; l /= 100;
+      let r, g, b;
+      if (s === 0) {
+        r = g = b = l;
+      } else {
+        const hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+      }
+      return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+    }
+
+    function rgbToHex(r, g, b){
+      return '#' + [r,g,b].map(v => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+    }
+
+    function hslToHex(h, s, l){
+      const {r,g,b} = hslToRgb(h,s,l);
+      return rgbToHex(r,g,b);
+    }
+
+    function hueToPoint(h){
+      const a = (h - 90) * Math.PI / 180;
+      const r = (outerR + innerR) / 2;
+      return { x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r };
+    }
+
+    function pointToHue(x, y){
+      const angle = Math.atan2(y - cy, x - cx);
+      return mod(angle * 180 / Math.PI + 90, 360);
+    }
+
+    function getHarmonyHues(base, mode){
+      base = mod(base, 360);
+      switch(mode){
+        case 'complementary': return [base, mod(base + 180, 360)];
+        case 'analogous': return [mod(base - 30, 360), base, mod(base + 30, 360)];
+        case 'triadic': return [base, mod(base + 120, 360), mod(base + 240, 360)];
+        case 'tetradic': return [base, mod(base + 90, 360), mod(base + 180, 360), mod(base + 270, 360)];
+        case 'monochromatic': return [base];
+        default: return [base];
+      }
+    }
+
+    function getPalette(){
+      const { hue, mode, saturation, lightness } = state;
+      const hues = getHarmonyHues(hue, mode);
+
+      if(mode === 'monochromatic'){
+        const variants = [
+          { s: clamp(saturation - 15, 15, 100), l: clamp(lightness - 22, 10, 90), label: 'Deep Tone' },
+          { s: saturation, l: clamp(lightness - 8, 10, 90), label: 'Mid Tone' },
+          { s: saturation, l: lightness, label: 'Base Tone' },
+          { s: clamp(saturation - 10, 15, 100), l: clamp(lightness + 15, 10, 95), label: 'Highlight Tone' }
+        ];
+        return variants.map(v => ({
+          role: v.label,
+          h: hues[0],
+          s: v.s,
+          l: v.l,
+          hex: hslToHex(hues[0], v.s, v.l)
+        }));
+      }
+
+      const labelsMap = {
+        complementary: ['Base', 'Complement'],
+        analogous: ['Analog Left', 'Base', 'Analog Right'],
+        triadic: ['Base', 'Triad 2', 'Triad 3'],
+        tetradic: ['Base', 'Tet 2', 'Tet 3', 'Tet 4']
+      };
+      const labels = labelsMap[mode] || hues.map((_, i) => `Color ${i+1}`);
+
+      return hues.map((h, i) => ({
+        role: labels[i] || `Color ${i+1}`,
+        h,
+        s: saturation,
+        l: lightness,
+        hex: hslToHex(h, saturation, lightness)
+      }));
+    }
+
+    function createSvgEl(name, attrs = {}){
+      const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+      Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
+      return el;
+    }
+
+    function describeMode(mode){
+      const map = {
+        complementary: 'Two opposing hues for strong contrast.',
+        analogous: 'Neighboring hues for smoother color motion.',
+        triadic: 'Three evenly spaced hues for bold balance.',
+        tetradic: 'Four evenly spaced hues for maximum spread.',
+        monochromatic: 'Single hue with tonal variation.'
+      };
+      return map[mode] || '';
+    }
+
+    function drawWheel(){
+      svg.innerHTML = '';
+
+      const defs = createSvgEl('defs');
+      const grad = createSvgEl('radialGradient', { id: 'centerFade', cx: '50%', cy: '50%', r: '55%' });
+      grad.appendChild(createSvgEl('stop', { offset: '0%', 'stop-color': '#0B1020', 'stop-opacity': '.95' }));
+      grad.appendChild(createSvgEl('stop', { offset: '72%', 'stop-color': '#0B1020', 'stop-opacity': '.78' }));
+      grad.appendChild(createSvgEl('stop', { offset: '100%', 'stop-color': '#0B1020', 'stop-opacity': '.0' }));
+      defs.appendChild(grad);
+      svg.appendChild(defs);
+
+      for(let deg = 0; deg < 360; deg += 1){
+        const start = (deg - 90) * Math.PI / 180;
+        const end = (deg + 1 - 90) * Math.PI / 180;
+        const x1o = cx + Math.cos(start) * outerR;
+        const y1o = cy + Math.sin(start) * outerR;
+        const x2o = cx + Math.cos(end) * outerR;
+        const y2o = cy + Math.sin(end) * outerR;
+        const x1i = cx + Math.cos(start) * innerR;
+        const y1i = cy + Math.sin(start) * innerR;
+        const x2i = cx + Math.cos(end) * innerR;
+        const y2i = cy + Math.sin(end) * innerR;
+
+        svg.appendChild(createSvgEl('path', {
+          d: `M ${x1o} ${y1o} A ${outerR} ${outerR} 0 0 1 ${x2o} ${y2o} L ${x2i} ${y2i} A ${innerR} ${innerR} 0 0 0 ${x1i} ${y1i} Z`,
+          fill: `hsl(${deg} 100% 50%)`,
+          stroke: 'none'
+        }));
+      }
+
+      svg.appendChild(createSvgEl('circle', {
+        cx, cy, r: innerR - 18,
+        fill: 'rgba(8,12,24,.95)',
+        stroke: 'rgba(255,255,255,.08)',
+        'stroke-width': 2
+      }));
+
+      svg.appendChild(createSvgEl('circle', {
+        cx, cy, r: innerR + 2,
+        fill: 'none',
+        stroke: 'rgba(255,255,255,.10)',
+        'stroke-width': 2
+      }));
+
+      const palette = getPalette();
+      const isMono = state.mode === 'monochromatic';
+      const lineGroup = createSvgEl('g');
+      const handleGroup = createSvgEl('g');
+
+      if(!isMono){
+        palette.forEach((item) => {
+          const p = hueToPoint(item.h);
+          lineGroup.appendChild(createSvgEl('line', {
+            x1: cx, y1: cy, x2: p.x, y2: p.y,
+            stroke: 'rgba(255,255,255,.18)',
+            'stroke-width': 2
+          }));
+        });
+      } else {
+        const p = hueToPoint(state.hue);
+        lineGroup.appendChild(createSvgEl('line', {
+          x1: cx, y1: cy, x2: p.x, y2: p.y,
+          stroke: 'rgba(255,255,255,.18)',
+          'stroke-width': 2
+        }));
+      }
+      svg.appendChild(lineGroup);
+
+      palette.forEach((item, index) => {
+        const p = hueToPoint(item.h);
+        const isBase = (state.mode === 'monochromatic' && index === 2) ||
+                       (state.mode !== 'monochromatic' && Math.abs(mod(item.h - state.hue, 360)) < 0.01);
+
+        if(isBase){
+          handleGroup.appendChild(createSvgEl('circle', {
+            cx: p.x, cy: p.y, r: 16,
+            fill: item.hex,
+            stroke: '#fff',
+            'stroke-width': 4,
+            cursor: 'grab',
+            id: 'dragHandle'
+          }));
+          handleGroup.appendChild(createSvgEl('circle', {
+            cx: p.x, cy: p.y, r: 24,
+            fill: 'transparent',
+            cursor: 'grab',
+            id: 'dragHit'
+          }));
+        } else {
+          handleGroup.appendChild(createSvgEl('circle', {
+            cx: p.x, cy: p.y, r: 12,
+            fill: item.hex,
+            stroke: 'rgba(255,255,255,.85)',
+            'stroke-width': 2
+          }));
+        }
+      });
+      svg.appendChild(handleGroup);
+
+      const center = createSvgEl('g');
+      center.appendChild(createSvgEl('circle', {
+        cx, cy, r: 92,
+        fill: 'url(#centerFade)'
+      }));
+
+      const centerColor = hslToHex(state.hue, state.saturation, state.lightness);
+      center.appendChild(createSvgEl('circle', {
+        cx, cy, r: 46,
+        fill: centerColor,
+        stroke: 'rgba(255,255,255,.18)',
+        'stroke-width': 2
+      }));
+
+      const txt1 = createSvgEl('text', {
+        x: cx, y: cy - 62, 'text-anchor': 'middle',
+        fill: 'rgba(255,255,255,.95)', 'font-size': 22, 'font-weight': 800
+      });
+      txt1.textContent = state.mode.charAt(0).toUpperCase() + state.mode.slice(1);
+      center.appendChild(txt1);
+
+      const txt2 = createSvgEl('text', {
+        x: cx, y: cy + 6, 'text-anchor': 'middle',
+        fill: 'rgba(255,255,255,.95)', 'font-size': 18, 'font-weight': 700
+      });
+      txt2.textContent = centerColor;
+      center.appendChild(txt2);
+
+      const txt3 = createSvgEl('text', {
+        x: cx, y: cy + 34, 'text-anchor': 'middle',
+        fill: 'rgba(255,255,255,.72)', 'font-size': 12, 'font-weight': 600
+      });
+      txt3.textContent = describeMode(state.mode);
+      center.appendChild(txt3);
+
+      svg.appendChild(center);
+    }
+
+    function renderPalette(){
+      const palette = getPalette();
+      paletteEl.innerHTML = '';
+      palette.forEach(item => {
+        const swatch = document.createElement('div');
+        swatch.className = 'swatch';
+
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+        chip.style.background = item.hex;
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+
+        const title = document.createElement('div');
+        title.className = 'title';
+        title.textContent = item.role;
+
+        const sub = document.createElement('div');
+        sub.className = 'sub';
+        sub.innerHTML = `${item.hex}<br>HSL(${Math.round(item.h)}°, ${Math.round(item.s)}%, ${Math.round(item.l)}%)`;
+
+        meta.appendChild(title);
+        meta.appendChild(sub);
+
+        const btn = document.createElement('button');
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(item.hex);
+            btn.textContent = 'Copied';
+            setTimeout(() => btn.textContent = 'Copy', 1000);
+          } catch {
+            btn.textContent = 'Failed';
+            setTimeout(() => btn.textContent = 'Copy', 1000);
+          }
+        });
+
+        swatch.appendChild(chip);
+        swatch.appendChild(meta);
+        swatch.appendChild(btn);
+        paletteEl.appendChild(swatch);
+      });
+    }
+
+    function renderAll(){
+      drawWheel();
+      renderPalette();
+    }
+
+    function updateFromPointer(clientX, clientY){
+      const rect = svg.getBoundingClientRect();
+      const x = (clientX - rect.left) * (svg.viewBox.baseVal.width / rect.width);
+      const y = (clientY - rect.top) * (svg.viewBox.baseVal.height / rect.height);
+      state.hue = pointToHue(x, y);
+      renderAll();
+    }
+
+    svg.addEventListener('pointerdown', (e) => {
+      const id = e.target && e.target.id;
+      if(id === 'dragHandle' || id === 'dragHit'){
+        state.dragging = true;
+        svg.setPointerCapture(e.pointerId);
+        updateFromPointer(e.clientX, e.clientY);
+      }
+    });
+
+    svg.addEventListener('pointermove', (e) => {
+      if(!state.dragging) return;
+      updateFromPointer(e.clientX, e.clientY);
+    });
+
+    svg.addEventListener('pointerup', (e) => {
+      state.dragging = false;
+      try { svg.releasePointerCapture(e.pointerId); } catch(err) {}
+    });
+
+    svg.addEventListener('pointerleave', () => {
+      state.dragging = false;
+    });
+
+    modeEl.addEventListener('change', () => {
+      state.mode = modeEl.value;
+      renderAll();
+    });
+
+    copyPaletteBtn.addEventListener('click', async () => {
+      const text = getPalette().map(p => `${p.role}: ${p.hex}`).join('\n');
+      try {
+        await navigator.clipboard.writeText(text);
+        copyPaletteBtn.textContent = 'Copied';
+        setTimeout(() => copyPaletteBtn.textContent = 'Copy HEX palette', 1200);
+      } catch {
+        copyPaletteBtn.textContent = 'Failed';
+        setTimeout(() => copyPaletteBtn.textContent = 'Copy HEX palette', 1200);
+      }
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
